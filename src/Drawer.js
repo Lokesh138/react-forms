@@ -1,22 +1,25 @@
 import * as React from 'react';
 import Drawer from '@mui/material/Drawer';
-import { IconButton, Stack, TextField, Button } from '@mui/material';
+import { IconButton, Stack, Button } from '@mui/material';
+import { useForm, FormProvider } from "react-hook-form";
 import CloseIcon from '@mui/icons-material/Close';
+import FormInput from './FormInput';
+import { yupResolver } from "@hookform/resolvers/yup";
+import {schema} from './validationSchema'
+
+
+
 
 const TemporaryDrawer = ({ open, handleClose, handleSave }) => {
-  const [formData, setFormData] = React.useState({
-    name: "",
-    email: '',
-    officeNumber: '',
-    mobileNumber: '',
-    address: ''
-  })
 
-  const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.id]: event.target.value })
-  }
+  const methods = useForm({
+    resolver: yupResolver(schema),
+    mode: "onChange"
+  });
+  const { handleSubmit, formState } = methods;
 
-  const disabled = formData.name>2 || formData.mobileNumber.length!==10
+
+
 
   return (
     <div>
@@ -39,30 +42,60 @@ const TemporaryDrawer = ({ open, handleClose, handleSave }) => {
               <CloseIcon />
             </IconButton>
           </div>
-          <Stack direction="column" spacing={2}>
-            <TextField label="Name*" id="name" sx={{ padding: '5px' }} onChange={handleChange} />
-            <TextField label="MobileNumber*" id="mobileNumber" sx={{ padding: '5px' }} onChange={handleChange} />
-            <TextField label="Office Number" id="officeNumber" sx={{ padding: '5px' }} onChange={handleChange} />
-            <TextField label="Email" id="email" sx={{ padding: '5px' }} onChange={handleChange} />
-            <TextField label="Address" id="address" sx={{ padding: '5px' }}
-              onChange={handleChange}
-              inputProps={{
-                style: {
-                  height: '60px'
-                }
-              }}
-            />
+          <Stack direction="column" spacing={4}>
+            <FormProvider {...methods}>
+              <FormInput
+                id="name"
+                label="Name"
+                name="name"
+                required
+                errorobj={formState.errors}
+              />
+              <FormInput
+                id="mobileNumber"
+                label="MobileNumber"
+                name="mobileNumber"
+                required
+                errorobj={formState.errors}
+
+              />
+              <FormInput
+                id="officeNumber"
+                label="Office Number"
+                name="officeNumber"
+                errorobj={formState.errors}
+
+              />
+              <FormInput
+                id="email"
+                label="Email"
+                name="email"
+                errorobj={formState.errors}
+
+              />
+              <FormInput
+                id="address"
+                name="address"
+                label="Address"
+                inputProps={{
+                  style: {
+                    height: '60px'
+                  }
+                }}
+                errorobj={formState.errors}
+
+              />
+            </FormProvider>
           </Stack>
           <Button
             variant="outlined"
             color="secondary"
             sx={{ marginTop: '5px' }}
-            onClick={() => { handleSave(formData); handleClose() }}
-            disabled = {disabled}
+            onClick={handleSubmit(handleSave)}
           >Save</Button>
         </Drawer>
       </React.Fragment>
-    </div>
+    </div >
   );
 }
 

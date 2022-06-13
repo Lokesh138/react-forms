@@ -3,10 +3,17 @@ import { ThemeProvider } from "@mui/styles";
 import MaterialTable from "material-table";
 import React, { useState } from "react";
 import TemporaryDrawer from "./Drawer";
+import { useLocalStorage } from "./useLocalStorage";
+
+
 
 const App = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useLocalStorage("data", []);
   const [open, setOpen] = useState(false)
+
+  console.log(data)
+
+
   const options = {
     headerStyle: {
       backgroundColor: "purple",
@@ -35,9 +42,10 @@ const App = () => {
     setOpen(false)
   }
 
-  const handleSave = (object) =>{
-    setData([...data,object])
-  
+  const handleSave = (object) => {
+    setData([...data, object])
+    handleClose()
+
   }
 
   return (
@@ -45,7 +53,7 @@ const App = () => {
       <TemporaryDrawer
         open={open}
         handleClose={handleClose}
-        handleSave = {handleSave}
+        handleSave={handleSave}
       />
       <Grid container>
         <Grid item xs={2}>
@@ -67,7 +75,7 @@ const App = () => {
       <MaterialTable
         style={style}
         columns={columns}
-        data={data}
+        data={data || []}
         options={options}
       />
     </ThemeProvider>
